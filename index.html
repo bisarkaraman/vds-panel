@@ -1,1 +1,99 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>VDS Kontrol Paneli</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 15px;
+    }
+    .card {
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      background: #2563eb;
+      color: #fff;
+    }
+    pre {
+      background: #020617;
+      border: 1px solid #334155;
+      padding: 10px;
+      border-radius: 6px;
+      max-height: 200px;
+      overflow: auto;
+    }
+  </style>
+</head>
+<body>
 
+<h2>📊 VDS Kontrol Paneli</h2>
+
+<div class="card">
+  <h3>🔑 Lisans Anahtarı</h3>
+  <input id="serialKey" placeholder="Seri anahtar gir">
+  <button onclick="connect()">Bağlan</button>
+  <p id="status">Durum: -</p>
+</div>
+
+<div class="card">
+  <button onclick="fetchData()">📡 Veri Çek</button>
+  <button onclick="processData()">📦 Buffer İşle</button>
+</div>
+
+<div class="card">
+  <pre id="output"></pre>
+</div>
+
+<script>
+function log(msg) {
+  document.getElementById("output").textContent += msg + "\n";
+}
+
+const originalLog = console.log;
+console.log = (...args) => {
+  log(args.join(" "));
+  originalLog(...args);
+};
+
+const vdsDataHandler = {
+  status: "offline",
+  attemptVdsConnection(key) {
+    if (key === "VDS-PRO-2025-EUWX-9F3A-447B-PLT92") {
+      this.status = "connected";
+      console.log("VDS bağlantısı başarılı");
+    } else {
+      this.status = "invalid key";
+      console.log("Geçersiz lisans anahtarı");
+    }
+  },
+  getVdsStatus() {
+    return this.status;
+  },
+  async fetchRealtimeData() {
+    if (this.status !== "connected") {
+      console.log("Bağlı değil");
+      return null;
+    }
+    return {
+      cpu: Math.floor(Math.random() * 100) + "%",
+      ram: Math.floor(Math.random() * 100) + "%",
+      disk: Math.floor(Math.random() * 100) + "%"
+    };
+  },
+  processDataBuffer() {
